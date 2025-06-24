@@ -5,23 +5,30 @@ let quotes = [
   { text: "Stay hungry, stay foolish.", category: "Tech" }
 ];
 
-// Function to show a random quote
+// Function to display a random quote
 function showRandomQuote() {
   const quoteDisplay = document.getElementById("quoteDisplay");
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const randomQuote = quotes[randomIndex];
 
-  quoteDisplay.innerHTML = `
-    <blockquote>
-      "${randomQuote.text}"
-      <footer>Category: <em>${randomQuote.category}</em></footer>
-    </blockquote>
-  `;
+  // Clear previous content
+  quoteDisplay.innerHTML = '';
+
+  // Create blockquote element
+  const blockquote = document.createElement("blockquote");
+  blockquote.textContent = `"${randomQuote.text}"`;
+
+  // Create footer with category
+  const footer = document.createElement("footer");
+  footer.innerHTML = `Category: <em>${randomQuote.category}</em>`;
+
+  // Append to the quote display
+  quoteDisplay.appendChild(blockquote);
+  quoteDisplay.appendChild(footer);
 }
 
 // Function to add a new quote
 function addQuote() {
-  creatAddQuoteForm();
   const quoteText = document.getElementById("newQuoteText").value.trim();
   const quoteCategory = document.getElementById("newQuoteCategory").value.trim();
 
@@ -33,6 +40,8 @@ function addQuote() {
 
     quotes.push(newQuote);
     alert("Quote added successfully!");
+
+    // Clear form inputs
     document.getElementById("newQuoteText").value = '';
     document.getElementById("newQuoteCategory").value = '';
   } else {
@@ -40,26 +49,40 @@ function addQuote() {
   }
 }
 
-// Function to create the "Add Quote" form dynamically
+// Function to create the Add Quote form using createElement and appendChild
 function createAddQuoteForm() {
   const formContainer = document.getElementById("formContainer");
 
-  const formHTML = `
-    <h2>Add a New Quote</h2>
-    <input type="text" id="newQuoteText" placeholder="Enter quote text" />
-    <input type="text" id="newQuoteCategory" placeholder="Enter quote category" />
-    <button onclick="addQuote()">Add Quote</button>
-  `;
+  // Clear previous form
+  formContainer.innerHTML = '';
 
-  formContainer.innerHTML = formHTML;
+  const heading = document.createElement("h2");
+  heading.textContent = "Add a New Quote";
+
+  const quoteInput = document.createElement("input");
+  quoteInput.type = "text";
+  quoteInput.id = "newQuoteText";
+  quoteInput.placeholder = "Enter a new quote";
+
+  const categoryInput = document.createElement("input");
+  categoryInput.type = "text";
+  categoryInput.id = "newQuoteCategory";
+  categoryInput.placeholder = "Enter quote category";
+
+  const addButton = document.createElement("button");
+  addButton.textContent = "Add Quote";
+  addButton.addEventListener("click", addQuote);
+
+  // Append elements to the form container
+  formContainer.appendChild(heading);
+  formContainer.appendChild(quoteInput);
+  formContainer.appendChild(categoryInput);
+  formContainer.appendChild(addButton);
 }
 
-// Call the function to display the form on page load
-createAddQuoteForm();
-
-
-// Event listener for "Show New Quote" button
-document.getElementById("newQuote").addEventListener("click", showRandomQuote);
-
-// Show one quote by default on load
-showRandomQuote();
+// Initial setup when the page loads
+document.addEventListener("DOMContentLoaded", () => {
+  showRandomQuote();           // Display a random quote initially
+  createAddQuoteForm();        // Generate the add-quote form
+  document.getElementById("newQuote").addEventListener("click", showRandomQuote); // Button event
+});
