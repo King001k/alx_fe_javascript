@@ -160,6 +160,8 @@ function filterQuotes() {
 
   notifyUser("Sync complete.");
 }
+}
+
 function syncQuotes() {
   // Fetch latest from server
   fetchQuotesFromServer();
@@ -173,8 +175,6 @@ function syncQuotes() {
   console.log("Quotes synced with server!");
   notifyUser("Quotes synced with server!");
 }
-}
-
 function importFromJsonFile(event) {
   const fileReader = new FileReader();
   fileReader.onload = function(e) {
