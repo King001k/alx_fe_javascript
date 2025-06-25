@@ -191,12 +191,63 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
+const SERVER_URL = 'https://dummyjson.com/quotes?limit=100';
+
+// Merge server quotes into local, preferring server data
+function mergeQuotes(serverQuotes) {
+  const serverSet = new Map(serverQuotes.map(q => [q.quote, q]));
+  const localMap = new Map(quotes.map(q => [q.text, q]));
+
+  // Use server quote object if exists, else local
+  const merged = Array.from(new Set([...serverSet.keys(), ...localMap.keys()]))
+    .map(key => {
+      const svr = serverSet.get(key);
+      const loc = localMap.get(key);
+      return svr ? { text: svr.quote, category: loc?.category || 'Server' } : loc;
+    });
+
+  quotes = merged;
+  saveQuotes();
+}
+
+// Fetch and sync from server
+async function fetchAndSync() {
+  try {
+    const res = await fetch(SERVER_URL);
+    const data = await res.json();
+    if (data && Array.isArray(data.quotes)) {
+      mergeQuotes(data.quotes);
+      populateCategories();
+      filterQuotes();
+      notifyUser('Data synced from server. Server data is preferred.');
+    }
+  } catch (e) {
+    console.error('Fetch sync failed:', e);
+  }
+}
+
+// Notify users of conflict resolution
+function notifyUser(msg) {
+  const n = document.createElement('div');
+  n.textContent = msg;
+  n.style = 'position:fixed;top:10px;right:10px;background:#ffc;padding:10px;border:1px solid #cc0;';
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 5000);
+}
+
+
 // Initialize on page load
 document.addEventListener("DOMContentLoaded", () => {
   loadQuotes();
   showLastViewedQuote();
   populateCategories();
   createAddQuoteForm();
+  document.addEventListener("DOMContentLoaded", () => {
+  // existing initialization...
+  fetchAndSync();                  // initial sync on load
+  setInterval(fetchAndSync, 5 * 60 * 1000); // sync every 5 minutes
+});
+
 
   document.getElementById("newQuote").addEventListener("click", showRandomQuote);
   document.getElementById("exportBtn").addEventListener("click", exportToJsonFile);
