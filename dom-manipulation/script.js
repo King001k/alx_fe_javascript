@@ -6,7 +6,7 @@ let quotes = [
   { text: "Stay hungry, stay foolish.", category: "Tech" }
 ];
 
-const SERVER_URL = 'https://dummyjson.com/quotes?limit=100';
+const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts';
 
 function saveQuotes() {
   localStorage.setItem("quotes", JSON.stringify(quotes));
@@ -220,18 +220,21 @@ async function fetchQuotesFromServer() {
     const response = await fetch(SERVER_URL);
     const data = await response.json();
 
-    if (data && Array.isArray(data.quotes)) {
-      mergeQuotes(data.quotes);
-      populateCategories();
-      filterQuotes();
-      notifyUser('Quotes synced from server (server version used in conflicts).');
-    }
+    // Use the 'title' as quote text and 'body' as category for simulation
+    const serverQuotes = data.slice(0, 10).map(post => ({
+      text: post.title,
+      category: post.body.slice(0, 20) || 'Server'
+    }));
+
+    mergeQuotes(serverQuotes);
+    populateCategories();
+    filterQuotes();
+    notifyUser('Quotes synced from server using jsonplaceholder.');
   } catch (error) {
     console.error('Error fetching quotes from server:', error);
     notifyUser('Failed to sync with server.');
   }
 }
-
 // Init
 
 document.addEventListener("DOMContentLoaded", () => {
