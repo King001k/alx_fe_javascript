@@ -148,6 +148,19 @@ function filterQuotes() {
     quoteDisplay.appendChild(blockquote);
     quoteDisplay.appendChild(footer);
   });
+
+  function syncQuotes() {
+  // Simulate fetching latest from server
+  fetchQuotesFromServer();
+
+  // Optionally, push last local quote to server (simulate sync)
+  if (quotes.length > 0) {
+    postQuoteToServer(quotes[quotes.length - 1]);
+  }
+
+  notifyUser("Sync complete.");
+}
+
 }
 
 function importFromJsonFile(event) {
@@ -254,8 +267,6 @@ function postQuoteToServer(quote) {
   });
 }
 
-// Init
-
 document.addEventListener("DOMContentLoaded", () => {
   loadQuotes();
   showLastViewedQuote();
@@ -265,6 +276,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("exportBtn").addEventListener("click", exportToJsonFile);
   document.getElementById("importFile").addEventListener("change", importFromJsonFile);
   document.getElementById("categoryFilter").addEventListener("change", filterQuotes);
-  fetchQuotesFromServer();
-  setInterval(fetchQuotesFromServer, 5 * 60 * 1000);
+
+  // ✅ Call the syncQuotes function
+  syncQuotes();
+
+  // ✅ Periodically sync every 5 minutes
+  setInterval(syncQuotes, 5 * 60 * 1000);
 });
+
