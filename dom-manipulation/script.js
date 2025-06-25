@@ -63,6 +63,7 @@ function addQuote() {
   if (quoteText && quoteCategory) {
     const newQuote = { text: quoteText, category: quoteCategory };
     quotes.push(newQuote);
+    postQuoteToServer(newQuote); // simulate server sync
     saveQuotes();
     populateCategories();
     filterQuotes();
@@ -235,6 +236,24 @@ async function fetchQuotesFromServer() {
     notifyUser('Failed to sync with server.');
   }
 }
+
+function postQuoteToServer(quote) {
+  fetch("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(quote)
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("Quote posted to server:", data);
+  })
+  .catch(error => {
+    console.error("Error posting quote to server:", error);
+  });
+}
+
 // Init
 
 document.addEventListener("DOMContentLoaded", () => {
